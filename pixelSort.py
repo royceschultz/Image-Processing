@@ -7,14 +7,8 @@ def value(pixel):
     return sum(pixel)
 
 def sortBySum(x):
-    x = list(x)
-    for i in range(len(x)):
-        for j in range(i):
-            if sum(x[i]) < sum(x[j]):
-                y = x.pop(i)
-                x.insert(j, y)
-                break
-    return np.array(x)
+    sum = np.sum(x, axis=1)
+    return x[sum.argsort()]
 
 def dist(x,y):
     d = 0
@@ -27,24 +21,22 @@ def pixelSort(imageName, tol, numCycles):
     (m, n, l) = image.shape
     print(m,n,l)
     mpimg.imsave('SortImageFrames/'+str(0)+'.png',image,format='png',dpi=100)
-    image = image.tolist()
 
     for cycle in range(numCycles):
         print(cycle)
         for row in range(m):
             randCol = random.randint(0,n-1)
-
             j = randCol
+            k = randCol
+
             while j > 1 and dist(image[row][j-1], image[row][randCol]) < tol:
                 j -= 1
-            k = randCol
             while k+1 < n and dist(image[row][k+1], image[row][randCol]) < tol and sum(image[row][k]) < 2:
                 k += 1
-            image[row][j:k] = sortBySum(image[row][j:k])
+            if j != k:
+                image[row][j:k] = sortBySum(image[row][j:k])
 
-        image = np.array(image)
         mpimg.imsave('SortImageFrames/'+str(cycle+1)+'.png',image,format='png',dpi=100)
-        image = image.tolist()
 
 
 pixelSort('image.png',0.42,100)
